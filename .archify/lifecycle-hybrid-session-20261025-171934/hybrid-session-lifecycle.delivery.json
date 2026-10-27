@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "d4bb7d0f-5968-40a0-8323-2f2da8a35ceb",
+  "status": "current",
+  "command": "deliver",
+  "type": "lifecycle",
+  "input": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/lifecycle-hybrid-session-20261025-171934/candidate.json",
+  "output": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/lifecycle-hybrid-session-20261025-171934/hybrid-session-lifecycle.html",
+  "specification": {
+    "sha256": "937532394a26b81bde98feb243d5088f1e26853cd0d5a5eddde3c0a5bdde3274",
+    "bytes": 4036
+  },
+  "artifact": {
+    "sha256": "98611db6c20afd63736a6b8c85eefc927cf6d906af9045e192d3dd7274ca9fda",
+    "bytes": 820604
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "schema_version": 3,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Vòng đời HybridSession",
+    "output": ".archify/lifecycle-hybrid-session-20261025-171934/hybrid-session-lifecycle.html",
+    "locale": "vi",
+    "quality_profile": "showcase"
+  },
+  "mainPath": [
+    "advertising",
+    "connected",
+    "handshake-done",
+    "await-user",
+    "done"
+  ],
+  "states": [
+    {
+      "id": "advertising",
+      "type": "start",
+      "label": "ADVERTISING",
+      "sublabel": "quảng bá EID, chờ trình duyệt",
+      "tag": "khởi tạo",
+      "step": "01"
+    },
+    {
+      "id": "connected",
+      "type": "active",
+      "label": "CONNECTED",
+      "sublabel": "đã có central GATT",
+      "tag": "chờ handshake",
+      "step": "02"
+    },
+    {
+      "id": "handshake-done",
+      "type": "active",
+      "label": "HANDSHAKE_DONE",
+      "sublabel": "kênh Noise đã thiết lập",
+      "tag": "dừng advert",
+      "step": "03"
+    },
+    {
+      "id": "await-user",
+      "type": "waiting",
+      "label": "AWAIT_USER",
+      "sublabel": "hộp thoại phê duyệt",
+      "tag": "chờ người dùng",
+      "step": "04"
+    },
+    {
+      "id": "done",
+      "type": "success",
+      "label": "DONE",
+      "sublabel": "đã gửi Approved / Rejected",
+      "tag": "kết thúc",
+      "step": "05"
+    },
+    {
+      "id": "error",
+      "type": "failure",
+      "label": "ERROR",
+      "sublabel": "fail(reason) + shutdown()",
+      "tag": "kết thúc"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "advertising-connected",
+      "from": "advertising",
+      "to": "connected",
+      "label": "kết nối"
+    },
+    {
+      "id": "connected-handshake-done",
+      "from": "connected",
+      "to": "handshake-done",
+      "label": "msg1 hợp lệ",
+      "variant": "security"
+    },
+    {
+      "id": "handshake-done-await-user",
+      "from": "handshake-done",
+      "to": "await-user",
+      "label": "challenge"
+    },
+    {
+      "id": "await-user-done",
+      "from": "await-user",
+      "to": "done",
+      "label": "respond()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "connected-advertising",
+      "from": "connected",
+      "to": "advertising",
+      "label": "browser ngắt",
+      "note": "quảng bá lại, chờ trình duyệt khác"
+    },
+    {
+      "id": "advertising-error",
+      "from": "advertising",
+      "to": "error",
+      "label": "BT tắt / QR hết hạn",
+      "variant": "security"
+    },
+    {
+      "id": "connected-error",
+      "from": "connected",
+      "to": "error",
+      "label": "sai handshake ×3",
+      "variant": "security"
+    },
+    {
+      "id": "handshake-done-error",
+      "from": "handshake-done",
+      "to": "error",
+      "label": "browser ngắt",
+      "variant": "security"
+    },
+    {
+      "id": "await-user-error",
+      "from": "await-user",
+      "to": "error",
+      "label": "ngắt / hết giờ / cancel",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Luồng chính",
+      "items": [
+        "HybridSession được tạo khi quét QR hợp lệ và bắt đầu ở ADVERTISING",
+        "kết nối = central GATT kết nối; msg1 = HANDSHAKE_1 qua kiểm psk; challenge = nhận DATA đã mã hóa",
+        "Mỗi phiên chỉ phục vụ một QR và một central GATT",
+        "DONE là kết thúc cho cả hai kết quả Approve và Reject"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Vào ERROR",
+      "items": [
+        "fail() bỏ qua nếu đã DONE hoặc ERROR",
+        "Timeout theo TTL còn lại của QR, cancel() và lỗi giao thức đều gọi fail()",
+        "shutdown() hủy timeout, dừng peripheral và tắt worker thread"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Luồng xử lý",
+      "items": [
+        "Callback BLE đến trên binder thread và được chuyển sang một worker thread",
+        "Mọi callback UI được post lên main thread"
+      ]
+    }
+  ]
+}

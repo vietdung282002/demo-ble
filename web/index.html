@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BLE Proximity Login</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>BLE proximity login</h1>
+        <p class="sub">Scan the QR code with the demo app, then connect over Bluetooth. Only a phone within radio range can finish the handshake.</p>
+      </header>
+
+      <p id="unsupported" class="banner" hidden>
+        Web Bluetooth is not available in this browser. Use Chrome or Edge on desktop, served from <code>http://localhost</code>.
+      </p>
+
+      <section class="layout">
+        <div class="card qr-card">
+          <div id="qr" class="qr" aria-label="Login QR code"></div>
+          <div class="qr-meta">
+            <span id="expiry">—</span>
+            <button id="newQr" class="ghost" type="button">New QR</button>
+          </div>
+          <button id="connect" class="primary" type="button">Connect nearby phone</button>
+          <div id="code" class="code" hidden>
+            <span class="label">Handshake code</span>
+            <span id="codeValue" class="value"></span>
+            <span class="hint">Must match the code shown on the phone</span>
+          </div>
+          <div id="result" class="result" hidden></div>
+        </div>
+
+        <div class="card">
+          <ol id="steps" class="steps">
+            <li data-step="qr">QR code shown</li>
+            <li data-step="device">Phone selected in Bluetooth chooser</li>
+            <li data-step="eid">Advert EID verified (phone scanned this QR)</li>
+            <li data-step="handshake">Noise KNpsk0 handshake complete</li>
+            <li data-step="approve">Phone approved the challenge</li>
+          </ol>
+          <h2>Log</h2>
+          <pre id="log" class="log"></pre>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

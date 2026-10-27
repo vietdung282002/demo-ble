@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.BleAuth" parent="Theme.AppCompat.DayNight.DarkActionBar" />
+</resources>

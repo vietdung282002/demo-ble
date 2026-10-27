@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "lifecycle",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/lifecycle-hybrid-session-20261025-171934/candidate.json",
+    "sha256": "937532394a26b81bde98feb243d5088f1e26853cd0d5a5eddde3c0a5bdde3274",
+    "bytes": 4036
+  },
+  "artifact": {
+    "path": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/lifecycle-hybrid-session-20261025-171934/hybrid-session-lifecycle.html",
+    "sha256": "98611db6c20afd63736a6b8c85eefc927cf6d906af9045e192d3dd7274ca9fda",
+    "bytes": 820604
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [
+    {
+      "code": "i18n/locale-fallback",
+      "severity": "warning",
+      "message": "meta.locale \"vi\" has no bundled catalog and no usable meta.translations; the Viewer chrome and <html lang> fall back to English.",
+      "subject": {
+        "diagramType": "lifecycle",
+        "path": "/meta/locale"
+      },
+      "evidence": {
+        "locale": "vi",
+        "bundledLocales": [
+          "en",
+          "zh-CN",
+          "zh-TW",
+          "es",
+          "ko",
+          "ar"
+        ]
+      },
+      "supportedFixes": [
+        "Supply meta.translations for this locale.",
+        "Use a bundled locale: en, zh-CN, zh-TW, es, ko, ar."
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 1,
+    "shown": 1,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/lifecycle-hybrid-session-20261025-171934/hybrid-session-lifecycle.finalize.json",
+    "summaryReceipt": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/lifecycle-hybrid-session-20261025-171934/hybrid-session-lifecycle.finalize-summary.json",
+    "browserCheckReceipt": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/lifecycle-hybrid-session-20261025-171934/hybrid-session-lifecycle.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-24T16:05:37.625Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 2015,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

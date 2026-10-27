@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "5613fdce-d1fb-478a-a097-86e226af691c",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/architecture-demo-ble-20261025-171934/candidate.json",
+  "output": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/architecture-demo-ble-20261025-171934/demo-ble-architecture.html",
+  "specification": {
+    "sha256": "096628358aecc4843fd8242b9d67b871aea67bf79c915d333e6dcc3d357e20c3",
+    "bytes": 5100
+  },
+  "artifact": {
+    "sha256": "78f01742bcd479f8e6a144fbf7e7c9d6a1c4a355af0fab71f891ecbf946c827e",
+    "bytes": 833622
+  }
+}

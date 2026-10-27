@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/architecture-demo-ble-20261025-171934/candidate.json",
+    "sha256": "096628358aecc4843fd8242b9d67b871aea67bf79c915d333e6dcc3d357e20c3",
+    "bytes": 5100
+  },
+  "artifact": {
+    "path": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/architecture-demo-ble-20261025-171934/demo-ble-architecture.html",
+    "sha256": "78f01742bcd479f8e6a144fbf7e7c9d6a1c4a355af0fab71f891ecbf946c827e",
+    "bytes": 833622
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [
+    {
+      "code": "i18n/locale-fallback",
+      "severity": "warning",
+      "message": "meta.locale \"vi\" has no bundled catalog and no usable meta.translations; the Viewer chrome and <html lang> fall back to English.",
+      "subject": {
+        "diagramType": "architecture",
+        "path": "/meta/locale"
+      },
+      "evidence": {
+        "locale": "vi",
+        "bundledLocales": [
+          "en",
+          "zh-CN",
+          "zh-TW",
+          "es",
+          "ko",
+          "ar"
+        ]
+      },
+      "supportedFixes": [
+        "Supply meta.translations for this locale.",
+        "Use a bundled locale: en, zh-CN, zh-TW, es, ko, ar."
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 1,
+    "shown": 1,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/architecture-demo-ble-20261025-171934/demo-ble-architecture.finalize.json",
+    "summaryReceipt": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/architecture-demo-ble-20261025-171934/demo-ble-architecture.finalize-summary.json",
+    "browserCheckReceipt": "/Users/tongvietdung/Documents/dungtv/demo-ble/.archify/architecture-demo-ble-20261025-171934/demo-ble-architecture.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-24T16:05:37.625Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 2245,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

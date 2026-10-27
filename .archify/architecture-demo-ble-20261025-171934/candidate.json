@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Kiến trúc BLE Proximity Login",
+    "output": ".archify/architecture-demo-ble-20261025-171934/demo-ble-architecture.html",
+    "locale": "vi",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    { "id": "qr-cdn", "type": "external", "label": "cdnjs", "sublabel": "qrcode-generator 1.4.4", "pos": [40, 40], "size": [160, 60] },
+    { "id": "user", "type": "external", "label": "Người dùng", "sublabel": "cầm điện thoại", "pos": [40, 180], "size": [140, 64] },
+    { "id": "static-server", "type": "backend", "label": "serve.mjs", "sublabel": "Node HTTP 127.0.0.1:8080", "pos": [470, 40], "size": [170, 60] },
+    { "id": "web-app", "type": "frontend", "label": "app.js", "sublabel": "UI + điều phối connectFlow", "pos": [310, 180], "size": [270, 64], "tag": "Noise initiator" },
+    { "id": "web-crypto", "type": "security", "label": "crypto.js + noise.js", "sublabel": "WebCrypto: HKDF, EID, KNpsk0", "pos": [450, 320], "size": [200, 60] },
+    { "id": "ble-link", "type": "frontend", "label": "ble.js · BleLink", "sublabel": "Web Bluetooth central", "pos": [860, 180], "size": [190, 64] },
+    { "id": "main-activity", "type": "frontend", "label": "MainActivity", "sublabel": "quét QR + hộp thoại duyệt", "pos": [250, 490], "size": [190, 64] },
+    { "id": "zxing", "type": "external", "label": "ZXing embedded", "sublabel": "zxing-android-embedded 4.3.0", "pos": [250, 630], "size": [190, 60] },
+    { "id": "hybrid-session", "type": "backend", "label": "HybridSession", "sublabel": "state machine, worker thread", "pos": [570, 490], "size": [190, 64] },
+    { "id": "noise-responder", "type": "security", "label": "NoiseResponder + Eid", "sublabel": "JCA: P-256, AES-GCM, HKDF", "pos": [570, 630], "size": [190, 60] },
+    { "id": "ble-peripheral", "type": "backend", "label": "BlePeripheral", "sublabel": "GATT server + advertiser", "pos": [860, 490], "size": [190, 64], "tag": "service 0xFFF3" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Máy tính · Chrome/Edge", "wraps": ["static-server", "web-app", "web-crypto", "ble-link"] },
+    { "kind": "region", "label": "Điện thoại Android 8+", "wraps": ["main-activity", "zxing", "hybrid-session", "noise-responder", "ble-peripheral"] }
+  ],
+  "connections": [
+    { "id": "user-clicks-connect", "from": "user", "to": "web-app", "label": "Connect" },
+    { "id": "cdn-script", "from": "qr-cdn", "to": "web-app", "label": "script QR", "variant": "dashed" },
+    { "id": "serve-static", "from": "static-server", "to": "web-app", "label": "HTTP tĩnh", "variant": "dashed" },
+    { "id": "web-uses-crypto", "from": "web-app", "to": "web-crypto", "label": "EID, psk, handshake" },
+    { "id": "web-to-ble", "from": "web-app", "to": "ble-link", "label": "send / receive frame", "variant": "emphasis" },
+    { "id": "qr-optical", "from": "web-app", "to": "main-activity", "label": "QR {pk, s, t}", "variant": "security" },
+    { "id": "user-approves", "from": "user", "to": "main-activity", "label": "Approve / Reject" },
+    { "id": "zxing-scan", "from": "zxing", "to": "main-activity", "label": "kết quả quét" },
+    { "id": "activity-to-session", "from": "main-activity", "to": "hybrid-session", "label": "start / respond" },
+    { "id": "session-uses-noise", "from": "hybrid-session", "to": "noise-responder", "label": "readMsg1 / writeMsg2" },
+    { "id": "session-to-peripheral", "from": "hybrid-session", "to": "ble-peripheral", "label": "send / callbacks", "variant": "emphasis" },
+    { "id": "ble-gatt", "from": "ble-link", "to": "ble-peripheral", "label": "GATT: EID, RX write, TX notify", "variant": "security" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Giao tiếp",
+      "items": [
+        "Chỉ hai bên: trình duyệt (central) và điện thoại (peripheral)",
+        "Không có tunnel server: mọi thông điệp đi qua BLE GATT",
+        "Frame [type][payload], chia chunk với bit 0x80 đánh dấu chunk cuối"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Xác thực",
+      "items": [
+        "QR mang khóa tĩnh P-256 và qrSecret, hết hạn sau 120s, dùng một lần",
+        "Advert EID chứng minh điện thoại đã quét đúng QR và đang ở gần",
+        "Noise_KNpsk0_P256_AESGCM_SHA256, mã 6 hex đối chiếu trên hai màn hình"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Dữ liệu và lưu trữ",
+      "items": [
+        "Không có database hay server xác thực",
+        "Trạng thái chỉ nằm trong RAM: biến session ở app.js, field của HybridSession",
+        "Không ký challenge bằng Android Keystore; chưa có xác minh phía server"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Phụ thuộc ngoài",
+      "items": [
+        "Web Bluetooth (chỉ Chromium) và WebCrypto của trình duyệt",
+        "Android BluetoothLeAdvertiser + BluetoothGattServer",
+        "cdnjs qrcode-generator, zxing-android-embedded, androidx.appcompat"
+      ]
+    }
+  ]
+}

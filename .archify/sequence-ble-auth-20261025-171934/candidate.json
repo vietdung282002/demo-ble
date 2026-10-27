@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Luồng xác thực BLE: Web ↔ Android",
+    "output": ".archify/sequence-ble-auth-20261025-171934/ble-auth-sequence.html",
+    "locale": "vi",
+    "quality_profile": "showcase"
+  },
+  "participants": [
+    { "id": "user", "type": "external", "label": "Người dùng", "sublabel": "máy tính + điện thoại" },
+    { "id": "web", "type": "frontend", "label": "Trình duyệt", "sublabel": "app.js · noise.js · ble.js" },
+    { "id": "peripheral", "type": "backend", "label": "BlePeripheral", "sublabel": "GATT server 0xFFF3" },
+    { "id": "session", "type": "security", "label": "HybridSession", "sublabel": "NoiseResponder" },
+    { "id": "phone-ui", "type": "frontend", "label": "MainActivity", "sublabel": "UI Android" }
+  ],
+  "segments": [
+    { "from": 150, "to": 312, "label": "1 · QR" },
+    { "from": 318, "to": 555, "label": "2 · Advert + kiểm EID" },
+    { "from": 560, "to": 740, "label": "3 · Handshake Noise KNpsk0" },
+    { "from": 745, "to": 1015, "label": "4 · Challenge + phê duyệt" }
+  ],
+  "messages": [
+    { "id": "show-qr", "from": "web", "to": "user", "y": 160, "label": "hiển thị QR BLEDEMO:{pk, s, t}", "note": "pk: khóa tĩnh P-256 mới; s: qrSecret 16B; QR hết hạn sau 120s" },
+    { "id": "scan-qr", "from": "user", "to": "phone-ui", "y": 218, "label": "quét QR bằng camera" },
+    { "id": "start-session", "from": "phone-ui", "to": "session", "y": 246, "label": "start(QrPayload)", "note": "kiểm tra TTL; EID = AES-ECB + HMAC từ qrSecret" },
+    { "id": "start-peripheral", "from": "session", "to": "peripheral", "y": 302, "label": "start(eid)" },
+    { "id": "advert", "from": "peripheral", "to": "web", "y": 330, "label": "advert 0xFFF3 + EID 20B", "variant": "dashed", "note": "TX power thấp: chỉ trình duyệt ở gần mới thấy" },
+    { "id": "click-connect", "from": "user", "to": "web", "y": 386, "label": "nhấn Connect nearby phone" },
+    { "id": "gatt-connect", "from": "web", "to": "peripheral", "y": 414, "label": "requestDevice + GATT connect" },
+    { "id": "central-connected", "from": "peripheral", "to": "session", "y": 442, "label": "onCentralConnected", "note": "ADVERTISING → CONNECTED" },
+    { "id": "read-eid", "from": "web", "to": "peripheral", "y": 488, "label": "đọc characteristic EID" },
+    { "id": "eid-value", "from": "peripheral", "to": "web", "y": 516, "label": "EID 20B", "variant": "return", "note": "web kiểm HMAC, giải mã lấy nonce; QR thành single-use" },
+    { "id": "handshake-1", "from": "web", "to": "peripheral", "y": 572, "label": "RX 0x01 HANDSHAKE_1 (psk, e)", "variant": "security" },
+    { "id": "deliver-hs1", "from": "peripheral", "to": "session", "y": 600, "label": "onMessage(HANDSHAKE_1)", "note": "kiểm psk + khóa tĩnh; sai 3 lần → ERROR" },
+    { "id": "handshake-2", "from": "session", "to": "peripheral", "y": 656, "label": "HANDSHAKE_2 (e, ee, se)", "variant": "security", "note": "dừng advert → HANDSHAKE_DONE" },
+    { "id": "notify-hs2", "from": "peripheral", "to": "web", "y": 700, "label": "TX notify HANDSHAKE_2", "variant": "security", "note": "hai màn hình hiện mã 6 hex từ handshake hash" },
+    { "id": "challenge", "from": "web", "to": "peripheral", "y": 756, "label": "RX 0x03 DATA: challenge (AES-GCM)", "variant": "emphasis" },
+    { "id": "deliver-challenge", "from": "peripheral", "to": "session", "y": 784, "label": "onMessage(DATA)", "note": "giải mã challenge → AWAIT_USER" },
+    { "id": "approval-request", "from": "session", "to": "phone-ui", "y": 830, "label": "onApprovalRequest(origin, code)" },
+    { "id": "approval-dialog", "from": "phone-ui", "to": "user", "y": 858, "label": "hộp thoại Approve sign-in?" },
+    { "id": "user-decision", "from": "user", "to": "phone-ui", "y": 886, "label": "Approve / Reject" },
+    { "id": "respond", "from": "phone-ui", "to": "session", "y": 914, "label": "respond(approved)" },
+    { "id": "result", "from": "session", "to": "peripheral", "y": 942, "label": "DATA: result {approved, echo}", "variant": "emphasis", "note": "→ DONE; tắt GATT server sau 1.5s" },
+    { "id": "notify-result", "from": "peripheral", "to": "web", "y": 986, "label": "TX notify result", "variant": "return", "note": "web kiểm echo == challenge → Approved" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Chứng minh ở gần",
+      "items": [
+        "Chooser chỉ liệt kê thiết bị đang quảng bá service 0xFFF3",
+        "EID chỉ giải mã được bằng khóa dẫn xuất từ qrSecret của QR hiện tại",
+        "psk = HKDF(qrSecret, advert plaintext) nên chỉ ai nhận được advert mới bắt tay được"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Thất bại và timeout",
+      "items": [
+        "Handshake 15s, chờ phê duyệt 60s (app.js)",
+        "Điện thoại gửi 0x7f ERROR khi HANDSHAKE_1 sai; sau 3 lần thì dừng phiên",
+        "Ngắt GATT sau HANDSHAKE_DONE làm phiên trên điện thoại chuyển sang ERROR"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Giới hạn",
+      "items": [
+        "origin do JavaScript tự khai báo, không chống phishing như WebAuthn",
+        "BLE relay vẫn có thể vượt qua kiểm tra khoảng cách"
+      ]
+    }
+  ]
+}
